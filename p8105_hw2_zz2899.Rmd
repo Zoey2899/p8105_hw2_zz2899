@@ -10,9 +10,41 @@ library(readxl)
 ```
 
 # Problem 1
-```{r, message=FALSE}
-wheel_data <- 
-  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx")%>%
-  janitor::clean_names()
+```{r, message=FALSE, warning=FALSE}
+#Read and clean the Mr. Trash Wheel sheet
+trash_data <- 
+  #read the excel and let it contain data entries only
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 1, range = "A2:N408")%>%
+  #use reasonable variable names
+  janitor::clean_names()%>%
+  #omit rows that do not include dumpster-specific data
+  drop_na(dumpster)%>%
+  #round the number of sports balls to the nearest integer
+  mutate(sports_balls = round(sports_balls, digits = 0))
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+#Read and clean precipitation data for 2018
+pre2018 <- 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 5, range = "A2:B14")%>%
+  #omit rows without precipitation data
+  drop_na(Total)%>%
+  #add a variable for year
+  mutate(year = 2018)
+
+#Read and clean precipitation data for 2019
+pre2019 <- 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 4, range = "A2:B14")%>%
+  #omit rows without precipitation data
+  drop_na(Total)%>%
+  #add a variable for year
+  mutate(year = 2019)
+
+#combine precipitation datasets
+pre_data <- 
+  bind_rows(pre2018, pre2019)%>%
+  #convert month to a character variable
+  mutate(Month = month.name[Month])
 ```
 
