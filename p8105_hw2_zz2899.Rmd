@@ -9,7 +9,7 @@ library(tidyverse)
 library(readxl)
 ```
 
-# Problem 1
+## Problem 1
 ```{r, message=FALSE, warning=FALSE}
 #Read and clean the Mr. Trash Wheel sheet
 trash_data <- 
@@ -22,7 +22,6 @@ trash_data <-
   #round the number of sports balls to the nearest integer
   mutate(sports_balls = round(sports_balls, digits = 0))
 ```
-
 
 ```{r, message=FALSE, warning=FALSE}
 #Read and clean precipitation data for 2018
@@ -47,4 +46,8 @@ pre_data <-
   #convert month to a character variable
   mutate(Month = month.name[Month])
 ```
+The data set `trash_data` has `r length(trash_data)` observations including the `r names(trash_data)`. It has a total of `r nrow(trash_data)` rows and `r ncol(trash_data)` columns. `month` is a character variable (e.g. "January", "February", "March"), `year` is a numeric variable (e.g. 2017), the variable `date` looks like yyyy-mm-dd, `weight_tons` is a numeric variable accurate to two decimal places, `homes_powered` is a numeric variable accurate to five decimal places, other variables are all numeric variables of integers. The data set `pre_data` has `r length(pre_data)` observations including the `r names(pre_data)`. It has a total of `r nrow(pre_data)` rows and `r ncol(pre_data)` columns. `month` is a character variable (e.g. "January", "February", "March"), `year` is a numeric variable that only contains 2018 and 2019, and `Total` is a numeric variable accurate to two decimal places.
+
+For available data, total precipitation in 2018 is `r sum(pull(pre2018, Total))`, and the median number of sports balls in a dumpster in 2019 is `r median(pull(filter(trash_data, year==2019), sports_balls))`.
+
 
