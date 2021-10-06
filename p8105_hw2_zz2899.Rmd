@@ -21,6 +21,7 @@ trash_data <-
   drop_na(dumpster)%>%
   #round the number of sports balls to the nearest integer
   mutate(sports_balls = round(sports_balls, digits = 0))
+
 ```
 
 ```{r, message=FALSE, warning=FALSE}
@@ -50,4 +51,46 @@ The data set `trash_data` has `r length(trash_data)` observations including the 
 
 For available data, total precipitation in 2018 is `r sum(pull(pre2018, Total))`, and the median number of sports balls in a dumpster in 2019 is `r median(pull(filter(trash_data, year==2019), sports_balls))`.
 
+## Problem 2
+```{r, message=FALSE, warning=FALSE}
+#Read and clean the data in pols-month.csv
+pols_month <- 
+  read_csv("./data/pols-month.csv")%>%
+  #break up the variable mon into variables year, month, and day
+  separate(mon, into = c("year", "month", "day"), sep = "-")%>%
+  #change variables year, month, and day to integers
+  mutate(year = as.numeric(year))%>%
+  mutate(month = as.numeric(month))%>%
+  mutate(day = as.numeric(day))%>%
+  #replace month number with month name
+  mutate(month = month.name[month])%>%
+  #create a president variable taking values gop and dem
+  mutate(president = case_when(prez_gop == 1 ~ "gop",
+                               prez_gop == 0 ~ "dem"))%>%
+  #remove prez_dem and prez_gop; and remove the day variable
+  select(-prez_gop, -prez_dem, -day)%>%
+  #arrange according to year and month
+  arrange(year, month)
+```
+
+```{r, message=FALSE, warning=FALSE}
+#clean the data in snp.csv
+snp_data <- 
+  read_csv("./data/snp.csv")%>%
+  #break up the variable date into variables month, day, and year
+  separate(date, into = c("month", "day", "year"), sep = "/")%>%
+  #change variables month, day, and year to integers
+  mutate(month = as.numeric(month))%>%
+  mutate(day = as.numeric(day))%>%
+  mutate(year = as.numeric(year))%>%
+  #replace month number with month name
+  mutate(month = month.name[as.numeric(month)])%>%
+  #change year to 4 digits
+  mutate(year = case_when(year > 20 ~ year + 1900,
+                          year < 20 ~ year + 2000))%>%
+  #arrange according to year and month
+  arrange(year, month)%>%
+  #remove the day variable and organize so that year and month are the leading columns
+  select(year, everything(), -day)
+```
 
