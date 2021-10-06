@@ -10,8 +10,8 @@ library(readxl)
 ```
 
 ## Problem 1
+Read and clean the Mr. Trash Wheel sheet
 ```{r, message=FALSE, warning=FALSE}
-#Read and clean the Mr. Trash Wheel sheet
 trash_data <- 
   #read the excel and let it contain data entries only
   read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 1, range = "A2:N408")%>%
@@ -24,8 +24,8 @@ trash_data <-
 
 ```
 
+Read and clean precipitation data for 2018
 ```{r, message=FALSE, warning=FALSE}
-#Read and clean precipitation data for 2018
 pre2018 <- 
   read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 5, range = "A2:B14")%>%
   #omit rows without precipitation data
@@ -52,8 +52,8 @@ The data set `trash_data` has `r length(trash_data)` observations including the 
 For available data, total precipitation in 2018 is `r sum(pull(pre2018, Total))`, and the median number of sports balls in a dumpster in 2019 is `r median(pull(filter(trash_data, year==2019), sports_balls))`.
 
 ## Problem 2
+Read and clean the data in `pols-month.csv`:
 ```{r, message=FALSE, warning=FALSE}
-#Read and clean the data in pols-month.csv
 pols_month <- 
   read_csv("./data/pols-month.csv")%>%
   #break up the variable mon into variables year, month, and day
@@ -72,9 +72,8 @@ pols_month <-
   #arrange according to year and month
   arrange(year, month)
 ```
-
+Read and clean the data in `snp.csv`:
 ```{r, message=FALSE, warning=FALSE}
-#clean the data in snp.csv
 snp_data <- 
   read_csv("./data/snp.csv")%>%
   #break up the variable date into variables month, day, and year
@@ -93,4 +92,32 @@ snp_data <-
   #remove the day variable and organize so that year and month are the leading columns
   select(year, everything(), -day)
 ```
+Read and tidy the data in `unemployment.csv`:
+```{r message=FALSE, warning=FALSE}
+unemployment <- 
+  read_csv("./data/unemployment.csv")%>%
+  #switching from “wide” to “long” format
+  pivot_longer(Jan:Dec,
+               names_to = "month",
+               values_to = "unemployment_percentage")%>%
+  #change month from abbreviation to full name
+  mutate(month = month.name[match(month, month.abb)])%>%
+  #change the column name "Year" to "year"
+  mutate(year = Year)%>%
+  select(year, everything(), -Year)%>%
+  #arrange according to year and month
+  arrange(year, month)
+```
+Merging `snp_data` into `pols_month`, and merging `unemployment` into the result:
+```{r message=FALSE, warning=FALSE}
+pols_snp_unemployment <- 
+  left_join(pols_month, snp_data)%>%
+  left_join(unemployment)
+```
+The data set `pols_month` has `r nrow(pols_month)` rows and `r ncol(pols_month)` columns with column names: `r names(pols_month)`. Range of year is (`r range(pull(pols_month, year))`).  
+The data set `snp_data` has `r nrow(snp_data)` rows and `r ncol(snp_data)` columns with column names: `r names(snp_data)`. Range of year is (`r range(pull(snp_data, year))`).  
+The data set `unemployment` has `r nrow(unemployment)` rows and `r ncol(unemployment)` columns with column names: `r names(unemployment)`. Range of year is (`r range(pull(unemployment, year))`).  
+The final resulting data set `pols_snp_unemployment` has `r nrow(pols_snp_unemployment)` rows and `r ncol(pols_snp_unemployment)` columns with column names: `r names(pols_snp_unemployment)`. Range of year is (`r range(pull(pols_snp_unemployment, year))`)
+
+## Problem 3
 
